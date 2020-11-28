@@ -9,7 +9,13 @@ $(reps_geojson): $(house_geojson) $(reps_csv)
 	mkdir -p $(dir $@)
 	npx mapshaper \
 		$< -join $(word 2, $^) keys=district,district fields=pledge,vote \
-		-o $@ \
+		-filter-fields district,full_name,party,url,email,phone,pledge,vote \
+		-style fill=gray fill-opacity=0.3 stroke=gray \
+		-style fill=blue where="party === 'Democrat'" \
+		-style fill=red where="party === 'Republican'" \
+		-style fill-opacity=0.6 where="pledge === 'yes'" \
+		-style fill=green where="vote === 'yes'" \
+		-o $@
 	@ls -lh $@
 
 $(house_geojson):
