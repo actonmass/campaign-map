@@ -1,0 +1,23 @@
+{
+  "name": "ma-legislature",
+  "version": "2020.11.0",
+  "description": "Geographic data for the Massachusetts legislature",
+  "dependencies": {
+    "mapshaper": "^0.5.26"
+  },
+  "author": "Brian H. Rutledge",
+  "license": "CC0-1.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bhrutledge/ma-legislature.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bhrutledge/ma-legislature/issues"
+  },
+  "homepage": "https://github.com/bhrutledge/ma-legislature#readme"
+}
