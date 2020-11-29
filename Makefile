@@ -26,8 +26,6 @@ $(reps_csv):
 	curl --create-dirs --output $@ --location \
 		"https://docs.google.com/spreadsheets/d/1iY5wzVUpAKRHBF-vrwyUBz9_wV93FVqu4MW5viPSkas/export?gid=0&format=csv"
 
-# TODO: Add distinct clean-dist and clean-cache, via clean-%, but see:
-# https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
 .PHONY: clean
 clean:
-	rm -rf dist cache
+	rm -rf $(reps_geojson) cache
