@@ -1,5 +1,4 @@
 /* global L */
-// TODO: fetch polyfill, e.g https://github.com/github/fetch
 fetch('/actonmass_reps.geojson')
   .then((response) => response.json())
   .then((repsData) => {
@@ -18,7 +17,7 @@ fetch('/actonmass_reps.geojson')
             <a href="mailto:${props.email}">${props.email}</a><br>
             <a href="tel:${props.phone}">${props.phone}</a><br>
         </p>
-      `);
+        `);
       },
       style(feature) {
         // TODO: Do styling here instead of Makefile
