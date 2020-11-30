@@ -1,5 +1,5 @@
 /* global L */
-fetch('/actonmass_reps.geojson')
+fetch('actonmass_reps.geojson')
   .then((response) => response.json())
   .then((repsData) => {
     const repsLayer = L.geoJson(repsData, {
