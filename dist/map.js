@@ -6,17 +6,24 @@ fetch('/actonmass_reps.geojson')
       onEachFeature(feature, layer) {
         const props = feature.properties;
 
-        // TODO: Link to actonmass
         layer.bindPopup(`
         <p><strong>${props.district}</strong></p>
         <p>
-            <a href="${props.url}">${props.full_name}</a><br>
-            ${props.party}
+          <img src="${props.photo}" alt="Photo"><br>
+          <a href="${props.url}">${props.full_name}</a><br>
+          ${props.party}<br>
+          <a href="mailto:${props.email}">${props.email}</a><br>
+          <a href="tel:${props.phone}">${props.phone}</a><br>
+        </p>
+
+        <p>
+          Signed the pledge: ${props.pledge === 'yes' ? 'Yes' : 'Not yet'}</br>
+          Committed to vote: ${props.vote === 'yes' ? 'Yes' : 'Not yet'}</br>
         </p>
         <p>
-            <a href="mailto:${props.email}">${props.email}</a><br>
-            <a href="tel:${props.phone}">${props.phone}</a><br>
-        </p>
+          <a href="https://actonmass.org/the-campaign/?your_state_representative=${props.first_name} ${props.last_name}">
+            <strong>Join the Campaign!</strong>
+          </a>
         `);
       },
       style(feature) {

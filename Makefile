@@ -9,7 +9,6 @@ $(reps_geojson): $(house_geojson) $(reps_csv)
 	mkdir -p $(dir $@)
 	npx mapshaper \
 		$< -join $(word 2, $^) keys=district,district fields=pledge,vote \
-		-filter-fields district,full_name,party,url,email,phone,pledge,vote \
 		-o $@
 	@ls -lh $@
 
