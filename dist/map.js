@@ -30,7 +30,7 @@ fetch('/actonmass_reps.geojson')
     });
 
     L.map('map')
-      .addLayer(L.stamenTileLayer('toner-lite'))
+      .addLayer(L.tileLayer.provider('CartoDB.Positron'))
       .addLayer(repsLayer)
       .fitBounds(repsLayer.getBounds());
   });
