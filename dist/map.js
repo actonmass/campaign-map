@@ -20,11 +20,25 @@ fetch('/actonmass_reps.geojson')
         `);
       },
       style(feature) {
-        // TODO: Do styling here instead of Makefile
+        const props = feature.properties;
+
+        let partyColor;
+        switch (props.party) {
+          case 'Democrat':
+            partyColor = 'blue';
+            break;
+          case 'Republican':
+            partyColor = 'red';
+            break;
+          default:
+            partyColor = 'gray';
+        }
+
         return {
-          fillColor: feature.properties.fill,
-          fillOpacity: feature.properties['fill-opacity'],
-          color: feature.properties.stroke,
+          color: 'gray',
+          weight: 1,
+          fillColor: props.vote === 'yes' ? 'green' : partyColor,
+          fillOpacity: props.pledge === 'yes' ? '0.6' : '0.3',
         };
       },
     });
