@@ -1,7 +1,7 @@
 {
-  "name": "ma-legislature",
+  "name": "actonmass-rep-map",
   "version": "2020.11.0",
-  "description": "Geographic data for the Massachusetts legislature",
+  "description": "Representative Support for Act On Mass",
   "dependencies": {},
   "author": "Brian H. Rutledge",
   "license": "CC0-1.0",
@@ -17,10 +17,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bhrutledge/ma-legislature.git"
+    "url": "git+https://github.com/bhrutledge/actonmass-rep-map.git"
   },
   "bugs": {
-    "url": "https://github.com/bhrutledge/ma-legislature/issues"
+    "url": "https://github.com/bhrutledge/actonmass-rep-map/issues"
   },
-  "homepage": "https://github.com/bhrutledge/ma-legislature#readme"
+  "homepage": "https://github.com/bhrutledge/actonmass-rep-map#readme"
 }
