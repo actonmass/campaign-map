@@ -11,6 +11,7 @@
     body {
       margin: 0;
     }
+
     #map {
       height: 100%;
       width: 100%;
@@ -60,25 +61,25 @@
 
         function popupContent(rep) {
           return /* html */`
-                <p><strong>${rep.district}</strong></p>
-                <p>
-                    <img src="${rep.photo}" alt="Photo"><br>
-                    <a href="${rep.url}">${rep.full_name}</a><br>
-                    ${rep.party}<br>
-                    <a href="mailto:${rep.email}">${rep.email}</a><br>
-                    <a href="tel:${rep.phone}">${rep.phone}</a><br>
-                </p>
-            
-                <p>
-                    Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
-                    Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
-                </p>
-                <p>
-                    <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
-                    <strong>Join the Campaign!</strong>
-                    </a>
-                </p>
-                `;
+          <p><strong>${rep.district}</strong></p>
+          <p>
+            <img src="${rep.photo}" alt="Photo"><br>
+            <a href="${rep.url}">${rep.full_name}</a><br>
+            ${rep.party}<br>
+            <a href="mailto:${rep.email}">${rep.email}</a><br>
+            <a href="tel:${rep.phone}">${rep.phone}</a><br>
+          </p>
+      
+          <p>
+            Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
+            Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
+          </p>
+          <p>
+            <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
+              <strong>Join the Campaign!</strong>
+            </a>
+          </p>
+          `;
         }
 
         const supportersByDistrict = supporters.reduce((acc, cur) => {
