@@ -7,6 +7,50 @@ Promise.all([
     .then((response) => response.json()),
 ])
   .then(([supporters, houseFeatures]) => {
+    function featureStyle(rep) {
+      let partyColor;
+      switch (rep.party) {
+        case 'Democrat':
+          partyColor = 'blue';
+          break;
+        case 'Republican':
+          partyColor = 'red';
+          break;
+        default:
+          partyColor = 'gray';
+      }
+
+      return {
+        color: 'gray',
+        weight: 1,
+        fillColor: rep.vote ? 'green' : partyColor,
+        fillOpacity: rep.pledge ? '0.6' : '0.3',
+      };
+    }
+
+    function popupContent(rep) {
+      return /* html */`
+        <p><strong>${rep.district}</strong></p>
+        <p>
+          <img src="${rep.photo}" alt="Photo"><br>
+          <a href="${rep.url}">${rep.full_name}</a><br>
+          ${rep.party}<br>
+          <a href="mailto:${rep.email}">${rep.email}</a><br>
+          <a href="tel:${rep.phone}">${rep.phone}</a><br>
+        </p>
+
+        <p>
+          Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
+          Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
+        </p>
+        <p>
+          <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
+            <strong>Join the Campaign!</strong>
+          </a>
+        </p>
+      `;
+    }
+
     const supportersByDistrict = supporters.reduce((acc, cur) => {
       acc[cur.district] = cur;
       return acc;
@@ -19,45 +63,8 @@ Promise.all([
           ...feature.properties,
         };
 
-        layer.bindPopup(`
-          <p><strong>${rep.district}</strong></p>
-          <p>
-            <img src="${rep.photo}" alt="Photo"><br>
-            <a href="${rep.url}">${rep.full_name}</a><br>
-            ${rep.party}<br>
-            <a href="mailto:${rep.email}">${rep.email}</a><br>
-            <a href="tel:${rep.phone}">${rep.phone}</a><br>
-          </p>
-
-          <p>
-            Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}</br>
-            Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}</br>
-          </p>
-          <p>
-            <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
-              <strong>Join the Campaign!</strong>
-            </a>
-          </p>
-        `);
-
-        let partyColor;
-        switch (rep.party) {
-          case 'Democrat':
-            partyColor = 'blue';
-            break;
-          case 'Republican':
-            partyColor = 'red';
-            break;
-          default:
-            partyColor = 'gray';
-        }
-
-        layer.setStyle({
-          color: 'gray',
-          weight: 1,
-          fillColor: rep.vote ? 'green' : partyColor,
-          fillOpacity: rep.pledge ? '0.6' : '0.3',
-        });
+        layer.setStyle(featureStyle(rep));
+        layer.bindPopup(popupContent(rep));
       },
     });
 
