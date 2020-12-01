@@ -1,36 +1,50 @@
-/* global L */
-fetch('actonmass_reps.geojson')
-  .then((response) => response.json())
-  .then((repsData) => {
-    const repsLayer = L.geoJson(repsData, {
+/* global L, Papa */
+Promise.all([
+  fetch('https://docs.google.com/spreadsheets/d/1iY5wzVUpAKRHBF-vrwyUBz9_wV93FVqu4MW5viPSkas/export?gid=0&format=csv')
+    .then((response) => response.text())
+    .then((csv) => {
+      const supporters = Papa.parse(csv, { header: true }).data;
+      const districtSupporters = supporters.reduce((acc, cur) => {
+        acc[cur.district] = cur;
+        return acc;
+      }, {});
+      return Promise.resolve(districtSupporters);
+    }),
+  fetch('https://raw.githubusercontent.com/bhrutledge/ma-legislature/main/dist/ma_house.geojson')
+    .then((response) => response.json()),
+])
+  .then(([districtSupporters, districtFeatures]) => {
+    const repsLayer = L.geoJson(districtFeatures, {
       onEachFeature(feature, layer) {
-        const props = feature.properties;
+        const rep = feature.properties;
+        const supporter = districtSupporters[rep.district] || {};
 
         layer.bindPopup(`
-        <p><strong>${props.district}</strong></p>
+        <p><strong>${rep.district}</strong></p>
         <p>
-          <img src="${props.photo}" alt="Photo"><br>
-          <a href="${props.url}">${props.full_name}</a><br>
-          ${props.party}<br>
-          <a href="mailto:${props.email}">${props.email}</a><br>
-          <a href="tel:${props.phone}">${props.phone}</a><br>
+          <img src="${rep.photo}" alt="Photo"><br>
+          <a href="${rep.url}">${rep.full_name}</a><br>
+          ${rep.party}<br>
+          <a href="mailto:${rep.email}">${rep.email}</a><br>
+          <a href="tel:${rep.phone}">${rep.phone}</a><br>
         </p>
 
         <p>
-          Signed the pledge: ${props.pledge === 'yes' ? 'Yes' : 'Not yet'}</br>
-          Committed to vote: ${props.vote === 'yes' ? 'Yes' : 'Not yet'}</br>
+          Signed the pledge: ${supporter.pledge === 'yes' ? 'Yes' : 'Not yet'}</br>
+          Committed to vote: ${supporter.vote === 'yes' ? 'Yes' : 'Not yet'}</br>
         </p>
         <p>
-          <a href="https://actonmass.org/the-campaign/?your_state_representative=${props.first_name} ${props.last_name}">
+          <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
             <strong>Join the Campaign!</strong>
           </a>
         `);
       },
       style(feature) {
-        const props = feature.properties;
+        const rep = feature.properties;
+        const supporter = districtSupporters[rep.district] || {};
 
         let partyColor;
-        switch (props.party) {
+        switch (rep.party) {
           case 'Democrat':
             partyColor = 'blue';
             break;
@@ -44,8 +58,8 @@ fetch('actonmass_reps.geojson')
         return {
           color: 'gray',
           weight: 1,
-          fillColor: props.vote === 'yes' ? 'green' : partyColor,
-          fillOpacity: props.pledge === 'yes' ? '0.6' : '0.3',
+          fillColor: supporter.vote === 'yes' ? 'green' : partyColor,
+          fillOpacity: supporter.pledge === 'yes' ? '0.6' : '0.3',
         };
       },
     });

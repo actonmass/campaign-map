@@ -2,9 +2,7 @@
   "name": "ma-legislature",
   "version": "2020.11.0",
   "description": "Geographic data for the Massachusetts legislature",
-  "dependencies": {
-    "mapshaper": "^0.5.26"
-  },
+  "dependencies": {},
   "author": "Brian H. Rutledge",
   "license": "CC0-1.0",
   "main": "index.js",
