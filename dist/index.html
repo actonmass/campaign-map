@@ -1,22 +1,99 @@
 <html>
 
 <head>
-    <title>Representative Support for Act On Mass</title>
+  <title>Representative Support for Act On Mass</title>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-        crossorigin="" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin="" />
 </head>
 
 <body>
-    <div id="map" style="height: 100%; width: 100%"></div>
+  <div id="map" style="height: 100%; width: 100%"></div>
 
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-        crossorigin=""></script>
-    <script src="https://unpkg.com/leaflet-providers@1.11.0/leaflet-providers.js"></script>
-    <script src="https://unpkg.com/papaparse@5.3.0/papaparse.min.js"></script>
-    <script src="map.js"></script>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet-providers@1.11.0/leaflet-providers.js"></script>
+  <script src="https://unpkg.com/papaparse@5.3.0/papaparse.min.js"></script>
+
+  <script>
+    /* global L, Papa */
+    Promise.all([
+      fetch('https://docs.google.com/spreadsheets/d/1iY5wzVUpAKRHBF-vrwyUBz9_wV93FVqu4MW5viPSkas/export?gid=0&format=csv')
+        .then((response) => response.text())
+        .then((csv) => Promise.resolve(Papa.parse(csv, { header: true, dynamicTyping: true }).data)),
+      fetch('https://raw.githubusercontent.com/bhrutledge/ma-legislature/main/dist/ma_house.geojson')
+        .then((response) => response.json()),
+    ])
+      .then(([supporters, houseFeatures]) => {
+        function featureStyle(rep) {
+          let partyColor;
+          switch (rep.party) {
+            case 'Democrat':
+              partyColor = 'blue';
+              break;
+            case 'Republican':
+              partyColor = 'red';
+              break;
+            default:
+              partyColor = 'gray';
+          }
+
+          return {
+            color: 'gray',
+            weight: 1,
+            fillColor: rep.vote ? 'green' : partyColor,
+            fillOpacity: rep.pledge ? '0.6' : '0.3',
+          };
+        }
+
+        function popupContent(rep) {
+          return /* html */`
+                <p><strong>${rep.district}</strong></p>
+                <p>
+                    <img src="${rep.photo}" alt="Photo"><br>
+                    <a href="${rep.url}">${rep.full_name}</a><br>
+                    ${rep.party}<br>
+                    <a href="mailto:${rep.email}">${rep.email}</a><br>
+                    <a href="tel:${rep.phone}">${rep.phone}</a><br>
+                </p>
+            
+                <p>
+                    Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
+                    Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
+                </p>
+                <p>
+                    <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
+                    <strong>Join the Campaign!</strong>
+                    </a>
+                </p>
+                `;
+        }
+
+        const supportersByDistrict = supporters.reduce((acc, cur) => {
+          acc[cur.district] = cur;
+          return acc;
+        }, {});
+
+        const houseLayer = L.geoJson(houseFeatures, {
+          onEachFeature(feature, layer) {
+            const rep = {
+              ...supportersByDistrict[feature.properties.district],
+              ...feature.properties,
+            };
+
+            layer.setStyle(featureStyle(rep));
+            layer.bindPopup(popupContent(rep));
+          },
+        });
+
+        L.map('map')
+          .addLayer(L.tileLayer.provider('CartoDB.Positron'))
+          .addLayer(houseLayer)
+          .fitBounds(houseLayer.getBounds());
+      });
+  </script>
 </body>
 
 </html>
