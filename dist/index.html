@@ -16,6 +16,10 @@
       height: 100%;
       width: 100%;
     }
+
+    a {
+      color: #00529A !important;
+    }
   </style>
 </head>
 
@@ -46,7 +50,7 @@
           return acc;
         }, {});
 
-        function getRep(feature) {
+        function repProperties(feature) {
           return {
             ...supportersByDistrict[feature.properties.district],
             ...feature.properties,
@@ -56,14 +60,13 @@
         function districtPopup(rep) {
           return /* html */`
             <p><strong>${rep.district}</strong></p>
+            <p><img src="${rep.photo}" alt="Photo"></p>
             <p>
-              <img src="${rep.photo}" alt="Photo"><br>
               <a href="${rep.url}">${rep.full_name}</a><br>
               ${rep.party}<br>
               <a href="mailto:${rep.email}">${rep.email}</a><br>
               <a href="tel:${rep.phone}">${rep.phone}</a><br>
             </p>
-        
             <p>
               Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
               Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
@@ -77,28 +80,28 @@
         }
 
         function districtStyle(feature, options = {}) {
-          const rep = getRep(feature);
+          const rep = repProperties(feature);
 
           // TODO: Maybe set CSS classes instead, and use :hover
           // e.g. `district district--vote district--democrat`
 
           let fillColor = 'gray';
           if (rep.vote) {
-            fillColor = 'green';
+            fillColor = '#FBA300';
           } else if (rep.party === 'Democrat') {
-            fillColor = 'blue';
+            fillColor = '#00529A';
           }
 
           return {
             color: options.hover ? fillColor : 'gray',
             weight: options.hover ? 2 : 1,
             fillColor,
-            fillOpacity: '0.3',
+            fillOpacity: '0.5',
           };
         }
 
         function onEachDistrict(feature, layer) {
-          const rep = getRep(feature);
+          const rep = repProperties(feature);
 
           layer.bindPopup(districtPopup(rep));
 
