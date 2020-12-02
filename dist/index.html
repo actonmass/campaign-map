@@ -79,6 +79,9 @@
         function districtStyle(feature, options = {}) {
           const rep = getRep(feature);
 
+          // TODO: Maybe set CSS classes instead, and use :hover
+          // e.g. `district district--vote district--democrat`
+
           let fillColor = 'gray';
           if (rep.vote) {
             fillColor = 'green';
@@ -87,10 +90,10 @@
           }
 
           return {
-            color: 'gray',
-            weight: 1,
+            color: options.hover ? fillColor : 'gray',
+            weight: options.hover ? 2 : 1,
             fillColor,
-            fillOpacity: options.hover ? '0.6' : '0.3',
+            fillOpacity: '0.3',
           };
         }
 
