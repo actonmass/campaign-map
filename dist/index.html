@@ -39,23 +39,18 @@
     ])
       .then(([supporters, houseFeatures]) => {
         function featureStyle(rep) {
-          let partyColor;
-          switch (rep.party) {
-            case 'Democrat':
-              partyColor = 'blue';
-              break;
-            case 'Republican':
-              partyColor = 'red';
-              break;
-            default:
-              partyColor = 'gray';
+          let fillColor = 'gray';
+          if (rep.vote) {
+            fillColor = 'green';
+          } else if (rep.party === 'Democrat') {
+            fillColor = 'blue';
           }
 
           return {
             color: 'gray',
             weight: 1,
-            fillColor: rep.vote ? 'green' : partyColor,
-            fillOpacity: rep.pledge ? '0.6' : '0.3',
+            fillColor,
+            fillOpacity: '0.3',
           };
         }
 
