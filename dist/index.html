@@ -33,7 +33,10 @@
     Promise.all([
       fetch('https://docs.google.com/spreadsheets/d/1iY5wzVUpAKRHBF-vrwyUBz9_wV93FVqu4MW5viPSkas/export?gid=0&format=csv')
         .then((response) => response.text())
-        .then((csv) => Promise.resolve(Papa.parse(csv, { header: true, dynamicTyping: true }).data)),
+        .then((csv) => {
+          const parsed = Papa.parse(csv, { header: true, dynamicTyping: true });
+          return Promise.resolve(parsed.data);
+        }),
       fetch('https://raw.githubusercontent.com/bhrutledge/ma-legislature/main/dist/ma_house.geojson')
         .then((response) => response.json()),
     ])
@@ -43,61 +46,70 @@
           return acc;
         }, {});
 
+        function getRep(feature) {
+          return {
+            ...supportersByDistrict[feature.properties.district],
+            ...feature.properties,
+          };
+        }
+
+        function districtPopup(rep) {
+          return /* html */`
+            <p><strong>${rep.district}</strong></p>
+            <p>
+              <img src="${rep.photo}" alt="Photo"><br>
+              <a href="${rep.url}">${rep.full_name}</a><br>
+              ${rep.party}<br>
+              <a href="mailto:${rep.email}">${rep.email}</a><br>
+              <a href="tel:${rep.phone}">${rep.phone}</a><br>
+            </p>
+        
+            <p>
+              Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
+              Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
+            </p>
+            <p>
+              <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
+                <strong>Join the Campaign!</strong>
+              </a>
+            </p>
+          `;
+        }
+
+        function districtStyle(feature, options = {}) {
+          const rep = getRep(feature);
+
+          let fillColor = 'gray';
+          if (rep.vote) {
+            fillColor = 'green';
+          } else if (rep.party === 'Democrat') {
+            fillColor = 'blue';
+          }
+
+          return {
+            color: 'gray',
+            weight: 1,
+            fillColor,
+            fillOpacity: options.hover ? '0.6' : '0.3',
+          };
+        }
+
+        function onEachDistrict(feature, layer) {
+          const rep = getRep(feature);
+
+          layer.bindPopup(districtPopup(rep));
+
+          layer.on('mouseover', (e) => {
+            e.target.setStyle(districtStyle(feature, { hover: true }));
+          });
+          layer.on('mouseout', (e) => {
+            e.target.setStyle(districtStyle(feature, { hover: false }));
+          });
+        }
+
         const houseLayer = L.geoJson(houseFeatures, {
-          style(feature) {
-            const rep = {
-              ...supportersByDistrict[feature.properties.district],
-              ...feature.properties,
-            };
-
-            let fillColor = 'gray';
-            if (rep.vote) {
-              fillColor = 'green';
-            } else if (rep.party === 'Democrat') {
-              fillColor = 'blue';
-            }
-
-            return {
-              color: 'gray',
-              weight: 1,
-              fillColor,
-              fillOpacity: '0.3',
-            };
-          },
-          onEachFeature(feature, layer) {
-            const rep = {
-              ...supportersByDistrict[feature.properties.district],
-              ...feature.properties,
-            };
-
-            layer.bindPopup(/* html */`
-              <p><strong>${rep.district}</strong></p>
-              <p>
-                <img src="${rep.photo}" alt="Photo"><br>
-                <a href="${rep.url}">${rep.full_name}</a><br>
-                ${rep.party}<br>
-                <a href="mailto:${rep.email}">${rep.email}</a><br>
-                <a href="tel:${rep.phone}">${rep.phone}</a><br>
-              </p>
-          
-              <p>
-                Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
-                Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
-              </p>
-              <p>
-                <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
-                  <strong>Join the Campaign!</strong>
-                </a>
-              </p>
-            `);
-
-            layer.on('mouseover', (e) => {
-              e.target.setStyle({ fillOpacity: 0.6 });
-            });
-            layer.on('mouseout', (e) => {
-              houseLayer.resetStyle(e.target);
-            });
-          },
+          style: districtStyle,
+          onEachFeature: onEachDistrict,
         });
 
         L.map('map')
