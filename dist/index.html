@@ -38,59 +38,65 @@
         .then((response) => response.json()),
     ])
       .then(([supporters, houseFeatures]) => {
-        function featureStyle(rep) {
-          let fillColor = 'gray';
-          if (rep.vote) {
-            fillColor = 'green';
-          } else if (rep.party === 'Democrat') {
-            fillColor = 'blue';
-          }
-
-          return {
-            color: 'gray',
-            weight: 1,
-            fillColor,
-            fillOpacity: '0.3',
-          };
-        }
-
-        function popupContent(rep) {
-          return /* html */`
-          <p><strong>${rep.district}</strong></p>
-          <p>
-            <img src="${rep.photo}" alt="Photo"><br>
-            <a href="${rep.url}">${rep.full_name}</a><br>
-            ${rep.party}<br>
-            <a href="mailto:${rep.email}">${rep.email}</a><br>
-            <a href="tel:${rep.phone}">${rep.phone}</a><br>
-          </p>
-      
-          <p>
-            Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
-            Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
-          </p>
-          <p>
-            <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
-              <strong>Join the Campaign!</strong>
-            </a>
-          </p>
-          `;
-        }
-
         const supportersByDistrict = supporters.reduce((acc, cur) => {
           acc[cur.district] = cur;
           return acc;
         }, {});
 
         const houseLayer = L.geoJson(houseFeatures, {
+          style(feature) {
+            const rep = {
+              ...supportersByDistrict[feature.properties.district],
+              ...feature.properties,
+            };
+
+            let fillColor = 'gray';
+            if (rep.vote) {
+              fillColor = 'green';
+            } else if (rep.party === 'Democrat') {
+              fillColor = 'blue';
+            }
+
+            return {
+              color: 'gray',
+              weight: 1,
+              fillColor,
+              fillOpacity: '0.3',
+            };
+          },
           onEachFeature(feature, layer) {
             const rep = {
               ...supportersByDistrict[feature.properties.district],
               ...feature.properties,
             };
 
-            layer.setStyle(featureStyle(rep));
-            layer.bindPopup(popupContent(rep));
+            layer.bindPopup(/* html */`
+              <p><strong>${rep.district}</strong></p>
+              <p>
+                <img src="${rep.photo}" alt="Photo"><br>
+                <a href="${rep.url}">${rep.full_name}</a><br>
+                ${rep.party}<br>
+                <a href="mailto:${rep.email}">${rep.email}</a><br>
+                <a href="tel:${rep.phone}">${rep.phone}</a><br>
+              </p>
+          
+              <p>
+                Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
+                Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
+              </p>
+              <p>
+                <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
+                  <strong>Join the Campaign!</strong>
+                </a>
+              </p>
+            `);
+
+            layer.on('mouseover', (e) => {
+              e.target.setStyle({ fillOpacity: 0.6 });
+            });
+            layer.on('mouseout', (e) => {
+              houseLayer.resetStyle(e.target);
+            });
           },
         });
 
