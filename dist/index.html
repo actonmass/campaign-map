@@ -36,7 +36,7 @@
   <script>
     /* global L, Papa */
     Promise.all([
-      fetch('https://docs.google.com/spreadsheets/d/1iY5wzVUpAKRHBF-vrwyUBz9_wV93FVqu4MW5viPSkas/export?gid=0&format=csv')
+      fetch('https://docs.google.com/spreadsheets/d/1iY5wzVUpAKRHBF-vrwyUBz9_wV93FVqu4MW5viPSkas/export?gid=395703872&format=csv')
         .then((response) => response.text())
         .then((csv) => {
           const parsed = Papa.parse(csv, { header: true, dynamicTyping: true });
@@ -52,28 +52,31 @@
         }, {});
 
         function repProperties(feature) {
-          return {
-            ...supportersByDistrict[feature.properties.district],
-            ...feature.properties,
-          };
+          const supporter = supportersByDistrict[feature.properties.district];
+
+          // Supporter info from Sheet may be incomplete, so only prefer it to
+          // replace outgoing incumbents
+          return supporter && supporter.elect
+            ? { ...feature.properties, ...supporter } : { ...supporter, ...feature.properties };
         }
 
         function districtPopup(rep) {
-          return /* html */`
+          const repName = `${rep.first_name} ${rep.last_name}`;
+          return `
             <p><strong>${rep.district}</strong></p>
-            <p><img src="${rep.photo}" alt="Photo"></p>
+            ${rep.photo ? `<p><img src="${rep.photo}" alt="Photo"></p>` : ''}
             <p>
-              <a href="${rep.url}">${rep.full_name}</a><br>
-              ${rep.party}<br>
-              <a href="mailto:${rep.email}">${rep.email}</a><br>
-              <a href="tel:${rep.phone}">${rep.phone}</a><br>
+              <strong>${rep.url ? `<a href="${rep.url}">${repName}</a>` : repName}</strong>
+              <br>${rep.party} ${rep.elect ? '(Elect)' : ''}
+              ${rep.email ? `<br><a href="mailto:${rep.email}">${rep.email}</a>` : ''}
+              ${rep.phone ? `<br><a href="tel:${rep.phone}">${rep.phone}</a>` : ''}
             </p>
             <p>
               Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
               Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
             </p>
             <p>
-              <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}">
+              <a href="https://actonmass.org/the-campaign/?your_state_representative=${repName}">
                 <strong>Join the Campaign!</strong>
               </a>
             </p>
