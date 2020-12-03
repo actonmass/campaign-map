@@ -15,7 +15,7 @@
   },
   "scripts": {
     "start": "browser-sync dist -w",
-    "embed": "browser-sync embed -w",
+    "embed": "browser-sync embed -w -c bs-embed.js",
     "lint": "eslint dist/*",
     "format": "npm run lint -- --fix"
   },
