@@ -89,7 +89,7 @@
           let fillColor = 'gray';
           if (rep.vote) {
             fillColor = '#FBA300';
-          } else if (rep.party === 'Democrat') {
+          } else if (['Democrat', 'Unenrolled'].includes(rep.party)) {
             fillColor = '#00529A';
           }
 
