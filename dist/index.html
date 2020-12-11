@@ -40,7 +40,6 @@
       height: 1rem;
       margin-right: 0.5rem;
       border-radius: 2px;
-      opacity: 0.5;
     }
   </style>
 </head>
@@ -115,19 +114,24 @@
           return content;
         }
 
+        const colors = {
+          vote: 'rgba(0, 128, 0, 0.5)',
+          default: 'rgba(128, 128, 128, 0.5)',
+        };
+
         function districtStyle(feature, options = {}) {
           const rep = repProperties(feature);
 
           // TODO: Maybe set CSS classes instead, and use :hover
           // e.g. `district district--vote district--democrat`
 
-          const fillColor = rep.vote ? 'green' : 'gray';
+          const fillColor = rep.vote ? colors.vote : colors.default;
 
           return {
-            color: options.hover ? fillColor : 'gray',
+            color: options.hover ? fillColor : colors.default,
             weight: options.hover ? 2 : 1,
             fillColor,
-            fillOpacity: '0.5',
+            fillOpacity: 1,
           };
         }
 
@@ -154,11 +158,11 @@
           const div = L.DomUtil.create('div', 'legend');
           div.innerHTML = `
             <div class="legend__item">
-              <i style="background: green"></i>
+              <i style="background: ${colors.vote}"></i>
               Committed to Vote
             </div>
             <div class="legend__item">
-              <i style="background: gray"></i>
+              <i style="background: ${colors.default}"></i>
               Join District Team
             </div>
           `;
