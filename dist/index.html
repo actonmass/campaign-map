@@ -21,6 +21,27 @@
     a {
       color: #00529A !important;
     }
+
+    .legend {
+      background: white;
+      border: 2px solid rgba(0,0,0,0.2);
+      border-radius: 4px;
+      padding: 0 0.5rem;
+    }
+
+    .legend__item {
+      display: flex;
+      align-items: center;
+      margin: 0.5rem 0;
+    }
+
+    .legend__item i {
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0.5rem;
+      border-radius: 2px;
+      opacity: 0.5;
+    }
   </style>
 </head>
 
@@ -115,9 +136,26 @@
           onEachFeature: onEachDistrict,
         });
 
+        const districtLegend = L.control({ position: 'topright' });
+        districtLegend.onAdd = () => {
+          const div = L.DomUtil.create('div', 'legend');
+          div.innerHTML = `
+            <div class="legend__item">
+              <i style="background: green"></i>
+              Committed to Vote
+            </div>
+            <div class="legend__item">
+              <i style="background: gray"></i>
+              Join District Team
+            </div>
+          `;
+          return div;
+        };
+
         L.map('map')
           .addLayer(L.tileLayer.provider('CartoDB.Positron'))
           .addLayer(houseLayer)
+          .addControl(districtLegend)
           .fitBounds(houseLayer.getBounds());
       });
   </script>
