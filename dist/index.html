@@ -83,23 +83,36 @@
 
         function districtPopup(rep) {
           const repName = `${rep.first_name} ${rep.last_name}`;
-          return `
+
+          function ctaLink(text) {
+            const ctaURL = `https://actonmass.org/the-campaign/?your_state_representative=${repName}`;
+            return `<a href="${ctaURL}" target="_parent">${text}</a>`;
+          }
+
+          let content = `
             <p>
               <strong>${repName}</strong>
               ${rep.url ? `(<a href="${rep.url}">contact</a>)` : ''}
               <br />${rep.party} ${rep.elect ? '(Elect)' : ''}
               <br />${rep.district}
             </p>
-            <p>
-              Committed to Vote: ${rep.vote ? 'Yes' : 'Not yet'}
-              ${rep.vote_note ? `(${rep.vote_note})` : ''}
-            </p>
-            <p>
-              <a href="https://actonmass.org/the-campaign/?your_state_representative=${repName}" target="_parent">
-                <strong>Join District Team</strong>
-              </a>
-            </p>
           `;
+
+          if (rep.vote) {
+            content += `
+              <p>
+                <strong>Committed to Vote</strong>
+                ${rep.vote_note ? `<br />(${rep.vote_note})` : ''}
+                <br />${ctaLink('Join the Campaign')}
+              </p>
+            `;
+          } else {
+            content += `
+              <p>${ctaLink('<strong>Join District Team</strong>')}</p>
+            `;
+          }
+
+          return content;
         }
 
         function districtStyle(feature, options = {}) {
