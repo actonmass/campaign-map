@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>Representative Support for Act On Mass</title>
+  <title>Representative support for Act On Mass Transparency Campaign</title>
   <base target="_blank">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
@@ -24,7 +24,7 @@
 
     .legend {
       background: white;
-      border: 2px solid rgba(0,0,0,0.2);
+      border: 2px solid rgba(0, 0, 0, 0.2);
       border-radius: 4px;
       padding: 0 0.5rem;
     }
@@ -80,97 +80,85 @@
             ? { ...feature.properties, ...supporter } : { ...supporter, ...feature.properties };
         }
 
-        function districtPopup(rep) {
-          const repName = `${rep.first_name} ${rep.last_name}`;
-
-          function ctaLink(text) {
-            const ctaURL = `https://actonmass.org/the-campaign/?your_state_representative=${repName}`;
-            return `<a href="${ctaURL}" target="_parent">${text}</a>`;
-          }
-
-          let content = `
-            <p>
-              <strong>${repName}</strong>
-              ${rep.url ? `(<a href="${rep.url}">contact</a>)` : ''}
-              <br />${rep.party} ${rep.elect ? '(Elect)' : ''}
-              <br />${rep.district}
-            </p>
-          `;
-
-          if (rep.vote) {
-            content += `
-              <p>
-                <strong>Committed to Vote</strong>
-                ${rep.vote_note ? `<br />(${rep.vote_note})` : ''}
-                <br />${ctaLink('Join the Campaign')}
-              </p>
-            `;
-          } else {
-            content += `
-              <p>${ctaLink('<strong>Join District Team</strong>')}</p>
-            `;
-          }
-
-          return content;
-        }
-
         const colors = {
           vote: 'rgba(90, 186, 161, 0.6)',
           default: 'rgba(0, 0, 0, 0.2)',
         };
 
-        function districtStyle(feature, options = {}) {
-          const rep = repProperties(feature);
+        const districtLegend = () => `
+          <div class="legend__item">
+            <i style="background: ${colors.vote}"></i>
+            Committed to Vote
+          </div>
+          <div class="legend__item">
+            <i style="background: ${colors.default}"></i>
+            Join District Team
+          </div>
+        `;
 
+        const districtStyle = (rep, options = {}) => ({
           // TODO: Maybe set CSS classes instead, and use :hover
           // e.g. `district district--vote`
-
-          return {
-            color: colors.default,
-            weight: options.hover ? 3 : 1,
-            fillColor: rep.vote ? colors.vote : colors.default,
-            fillOpacity: 1,
-          };
-        }
-
-        function onEachDistrict(feature, layer) {
-          const rep = repProperties(feature);
-
-          layer.bindPopup(districtPopup(rep));
-
-          layer.on('mouseover', (e) => {
-            e.target.setStyle(districtStyle(feature, { hover: true }));
-          });
-          layer.on('mouseout', (e) => {
-            e.target.setStyle(districtStyle(feature, { hover: false }));
-          });
-        }
-
-        const houseLayer = L.geoJson(houseFeatures, {
-          style: districtStyle,
-          onEachFeature: onEachDistrict,
+          color: colors.default,
+          weight: options.hover ? 3 : 1,
+          fillColor: rep.vote ? colors.vote : colors.default,
+          fillOpacity: 1,
         });
 
-        const districtLegend = L.control({ position: 'topright' });
-        districtLegend.onAdd = () => {
+        const callToAction = (rep, text) => `
+          <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}"
+            target="_parent"
+          >
+            ${text}
+          </a>
+        `;
+
+        const districtPopup = (rep) => `
+          <p>
+            <strong>${rep.first_name} ${rep.last_name}</strong>
+            ${rep.url ? `(<a href="${rep.url}">contact</a>)` : ''}
+            <br />${rep.party} ${rep.elect ? '(Elect)' : ''}
+            <br />${rep.district}
+          </p>
+
+          <p>
+            ${rep.vote ? `
+              <strong>Committed to Vote</strong>
+              ${rep.vote_note ? `<br />(${rep.vote_note})` : ''}
+              <br />${callToAction(rep, 'Join the Campaign')}
+            ` : `
+              ${callToAction(rep, '<strong>Join District Team</strong>')}
+            `}
+          </p>
+        `;
+
+        const houseLayer = L.geoJson(houseFeatures, {
+          style: (feature) => districtStyle(repProperties(feature)),
+          onEachFeature: (feature, layer) => {
+            const rep = repProperties(feature);
+
+            layer.bindPopup(districtPopup(rep));
+
+            layer.on('mouseover', (e) => {
+              e.target.setStyle(districtStyle(rep, { hover: true }));
+            });
+            layer.on('mouseout', (e) => {
+              e.target.setStyle(districtStyle(rep, { hover: false }));
+            });
+          },
+        });
+
+        const legendControl = L.control({ position: 'topright' });
+        legendControl.onAdd = () => {
           const div = L.DomUtil.create('div', 'legend');
-          div.innerHTML = `
-            <div class="legend__item">
-              <i style="background: ${colors.vote}"></i>
-              Committed to Vote
-            </div>
-            <div class="legend__item">
-              <i style="background: ${colors.default}"></i>
-              Join District Team
-            </div>
-          `;
+          div.innerHTML = districtLegend();
           return div;
         };
 
         L.map('map')
           .addLayer(L.tileLayer.provider('CartoDB.Positron'))
           .addLayer(houseLayer)
-          .addControl(districtLegend)
+          .addControl(legendControl)
           .fitBounds(houseLayer.getBounds());
       });
   </script>
