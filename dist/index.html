@@ -63,21 +63,19 @@
         function districtPopup(rep) {
           const repName = `${rep.first_name} ${rep.last_name}`;
           return `
-            <p><strong>${rep.district}</strong></p>
-            ${rep.photo ? `<p><img src="${rep.photo}" alt="Photo"></p>` : ''}
             <p>
-              <strong>${rep.url ? `<a href="${rep.url}">${repName}</a>` : repName}</strong>
-              <br>${rep.party} ${rep.elect ? '(Elect)' : ''}
-              ${rep.email ? `<br><a href="mailto:${rep.email}">${rep.email}</a>` : ''}
-              ${rep.phone ? `<br><a href="tel:${rep.phone}">${rep.phone}</a>` : ''}
+              <strong>${repName}</strong>
+              ${rep.url ? `(<a href="${rep.url}">contact</a>)` : ''}
+              <br />${rep.party} ${rep.elect ? '(Elect)' : ''}
+              <br />${rep.district}
             </p>
             <p>
-              Signed the pledge: ${rep.pledge ? 'Yes' : 'Not yet'}<br />
-              Committed to vote: ${rep.vote ? 'Yes' : 'Not yet'}<br />
+              Committed to Vote: ${rep.vote ? 'Yes' : 'Not yet'}
+              ${rep.vote_note ? `(${rep.vote_note})` : ''}
             </p>
             <p>
               <a href="https://actonmass.org/the-campaign/?your_state_representative=${repName}" target="_parent">
-                <strong>Join the Campaign!</strong>
+                <strong>Join District Team</strong>
               </a>
             </p>
           `;
@@ -89,12 +87,7 @@
           // TODO: Maybe set CSS classes instead, and use :hover
           // e.g. `district district--vote district--democrat`
 
-          let fillColor = 'gray';
-          if (rep.vote) {
-            fillColor = '#FBA300';
-          } else if (['Democrat', 'Unenrolled'].includes(rep.party)) {
-            fillColor = '#00529A';
-          }
+          const fillColor = rep.vote ? 'green' : 'gray';
 
           return {
             color: options.hover ? fillColor : 'gray',
