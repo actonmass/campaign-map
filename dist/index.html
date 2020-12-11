@@ -115,22 +115,20 @@
         }
 
         const colors = {
-          vote: 'rgba(0, 128, 0, 0.5)',
-          default: 'rgba(128, 128, 128, 0.5)',
+          vote: 'rgba(90, 186, 161, 0.6)',
+          default: 'rgba(0, 0, 0, 0.2)',
         };
 
         function districtStyle(feature, options = {}) {
           const rep = repProperties(feature);
 
           // TODO: Maybe set CSS classes instead, and use :hover
-          // e.g. `district district--vote district--democrat`
-
-          const fillColor = rep.vote ? colors.vote : colors.default;
+          // e.g. `district district--vote`
 
           return {
-            color: options.hover ? fillColor : colors.default,
-            weight: options.hover ? 2 : 1,
-            fillColor,
+            color: colors.default,
+            weight: options.hover ? 3 : 1,
+            fillColor: rep.vote ? colors.vote : colors.default,
             fillOpacity: 1,
           };
         }
