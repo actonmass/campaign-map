@@ -9,6 +9,11 @@
     crossorigin="" />
 
   <style>
+    :root {
+      --join-color: rgba(0, 0, 0, 0.2);
+      --vote-color: rgba(90, 186, 161, 0.6);
+    }
+
     body {
       margin: 0;
     }
@@ -35,11 +40,33 @@
       margin: 0.5rem 0;
     }
 
-    .legend__item i {
-      width: 1rem;
-      height: 1rem;
-      margin-right: 0.5rem;
+    .legend__item::before {
+      background: var(--join-color);
       border-radius: 2px;
+      content: '';
+      display: block;
+      margin-right: 0.5rem;
+      height: 1rem;
+      width: 1rem;
+    }
+
+    .legend__item--vote::before {
+      background: var(--vote-color);
+    }
+
+    .district {
+      fill: var(--join-color);
+      fill-opacity: 1;
+      stroke: var(--join-color);
+      stroke-width: 1;
+    }
+
+    .district:hover {
+      stroke-width: 3;
+    }
+
+    .district--vote {
+      fill: var(--vote-color);
     }
   </style>
 </head>
@@ -80,29 +107,17 @@
             ? { ...feature.properties, ...supporter } : { ...supporter, ...feature.properties };
         }
 
-        const colors = {
-          vote: 'rgba(90, 186, 161, 0.6)',
-          default: 'rgba(0, 0, 0, 0.2)',
-        };
-
         const districtLegend = () => `
-          <div class="legend__item">
-            <i style="background: ${colors.vote}"></i>
+          <div class="legend__item legend__item--vote">
             Committed to Vote
           </div>
-          <div class="legend__item">
-            <i style="background: ${colors.default}"></i>
+          <div class="legend__item legend__item--join">
             Join District Team
           </div>
         `;
 
-        const districtStyle = (rep, options = {}) => ({
-          // TODO: Maybe set CSS classes instead, and use :hover
-          // e.g. `district district--vote`
-          color: colors.default,
-          weight: options.hover ? 3 : 1,
-          fillColor: rep.vote ? colors.vote : colors.default,
-          fillOpacity: 1,
+        const districtStyle = (rep) => ({
+          className: `district district--${rep.vote ? 'vote' : 'join'}`,
         });
 
         const callToAction = (rep, text) => `
@@ -135,16 +150,7 @@
         const houseLayer = L.geoJson(houseFeatures, {
           style: (feature) => districtStyle(repProperties(feature)),
           onEachFeature: (feature, layer) => {
-            const rep = repProperties(feature);
-
-            layer.bindPopup(districtPopup(rep));
-
-            layer.on('mouseover', (e) => {
-              e.target.setStyle(districtStyle(rep, { hover: true }));
-            });
-            layer.on('mouseout', (e) => {
-              e.target.setStyle(districtStyle(rep, { hover: false }));
-            });
+            layer.bindPopup(districtPopup(repProperties(feature)));
           },
         });
 
