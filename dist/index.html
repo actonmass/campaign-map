@@ -12,7 +12,9 @@
   <style>
     :root {
       --join-color: rgba(0, 0, 0, 0.2);
+      --join-color--active: rgba(0, 0, 0, 0.4);
       --vote-color: rgba(90, 186, 161, 0.6);
+      --vote-color--active: rgba(90, 186, 161, 0.9);
     }
 
     body {
@@ -63,11 +65,19 @@
     }
 
     .district:hover {
-      stroke-width: 3;
+      stroke-width: 4;
+    }
+
+    .district--active {
+      fill: var(--join-color--active);
     }
 
     .district--vote {
       fill: var(--vote-color);
+    }
+
+    .district--vote.district--active {
+      fill: var(--vote-color--active);
     }
 
     .leaflet-control-search .search-input {
@@ -169,6 +179,12 @@
           style: (feature) => districtStyle(repProperties(feature)),
           onEachFeature: (feature, layer) => {
             layer.bindPopup(districtPopup(repProperties(feature)));
+
+            function setActive(active = false) {
+              layer.getElement().classList.toggle('district--active', active);
+            }
+            layer.on('popupopen', () => setActive(true));
+            layer.on('popupclose', () => setActive(false));
           },
         });
 
