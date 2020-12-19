@@ -2,7 +2,6 @@
   "name": "actonmass-rep-map",
   "version": "2020.11.0",
   "description": "Representative Support for Act On Mass",
-  "dependencies": {},
   "author": "Brian H. Rutledge",
   "license": "CC0-1.0",
   "main": "index.js",
@@ -10,6 +9,7 @@
     "browser-sync": "^2.26.13",
     "eslint": "^7.14.0",
     "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-compat": "^3.9.0",
     "eslint-plugin-html": "^6.1.1",
     "eslint-plugin-import": "^2.22.1"
   },
@@ -25,5 +25,9 @@
   "bugs": {
     "url": "https://github.com/bhrutledge/actonmass-rep-map/issues"
   },
-  "homepage": "https://github.com/bhrutledge/actonmass-rep-map#readme"
+  "homepage": "https://github.com/bhrutledge/actonmass-rep-map#readme",
+  "browserslist": [
+    "defaults and > 0.5% in US",
+    "not IE 11"
+  ]
 }
