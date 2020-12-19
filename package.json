@@ -14,9 +14,8 @@
     "eslint-plugin-import": "^2.22.1"
   },
   "scripts": {
-    "serve": "browser-sync dist -w --no-open",
-    "embed": "browser-sync embed -w -c bs-embed.js --no-open",
-    "lint": "eslint dist/*",
+    "start": "browser-sync -c bs-config.js --no-open",
+    "lint": "eslint index.html",
     "format": "npm run lint -- --fix"
   },
   "repository": {
