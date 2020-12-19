@@ -13,8 +13,8 @@
     :root {
       --join-color: rgba(0, 0, 0, 0.2);
       --join-color--active: rgba(0, 0, 0, 0.4);
-      --vote-color: rgba(90, 186, 161, 0.6);
-      --vote-color--active: rgba(90, 186, 161, 0.9);
+      --committed-color: rgba(90, 186, 161, 0.6);
+      --committed-color--active: rgba(90, 186, 161, 0.9);
     }
 
     body {
@@ -53,8 +53,8 @@
       width: 1rem;
     }
 
-    .legend__item--vote::before {
-      background: var(--vote-color);
+    .legend__item--committed::before {
+      background: var(--committed-color);
     }
 
     .district {
@@ -72,12 +72,12 @@
       fill: var(--join-color--active);
     }
 
-    .district--vote {
-      fill: var(--vote-color);
+    .district--committed {
+      fill: var(--committed-color);
     }
 
-    .district--vote.district--active {
-      fill: var(--vote-color--active);
+    .district--committed.district--active {
+      fill: var(--committed-color--active);
     }
 
     .leaflet-control-search .search-input {
@@ -95,6 +95,23 @@
       border-radius: 0;
     }
 
+    table {
+      border-collapse: collapse;
+      border-spacing: 0;
+      font: inherit;
+      width: 100%;
+    }
+
+    th, td {
+      text-align: left;
+      vertical-align: baseline;
+      white-space: nowrap;
+    }
+
+    .commitment {
+      color: var(--committed-color--active);
+      padding-right: 0.25rem;
+    }
   </style>
 </head>
 
@@ -111,7 +128,7 @@
   <script>
     /* global L, Papa */
     Promise.all([
-      fetch('https://docs.google.com/spreadsheets/d/1iY5wzVUpAKRHBF-vrwyUBz9_wV93FVqu4MW5viPSkas/export?gid=395703872&format=csv')
+      fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTrAf6yjI_DEJF27SEqH7d5x4KAOjB4Mh0REXmRl1_yep9PEgvDlO8ADLcSz3JYaGzrvJLxXb0JzRYY/pub?gid=390923663&single=true&output=csv')
         .then((response) => response.text())
         .then((csv) => {
           const parsed = Papa.parse(csv, { header: true, dynamicTyping: true });
@@ -128,15 +145,17 @@
 
         function repProperties(feature) {
           const supporter = supportersByDistrict[feature.properties.district];
-
+          return supporter;
+          /* TODO: Join with feature properties once tracker data is finalized
           // Supporter info from Sheet may be incomplete, so only prefer it to
           // replace outgoing incumbents
           return supporter && supporter.elect
             ? { ...feature.properties, ...supporter } : { ...supporter, ...feature.properties };
+          */
         }
 
         const districtLegend = () => `
-          <div class="legend__item legend__item--vote">
+          <div class="legend__item legend__item--committed">
             Committed to Vote
           </div>
           <div class="legend__item legend__item--join">
@@ -145,14 +164,34 @@
         `;
 
         const districtStyle = (rep) => ({
-          className: `district district--${rep.vote ? 'vote' : 'join'}`,
+          className: `district district--${rep.commitments ? 'committed' : 'join'}`,
         });
 
-        const callToAction = (rep, text) => `
+        const repCommitments = (rep) => (rep.commitments ? `
+          <p>
+            <table>
+              <tr><th colspan="2">Committed to vote for:</strong>
+                <tr>
+                <td class="commitment">${rep.committee_votes ? '✓' : ''}</td>
+                <td>Committee votes made public</td>
+              </tr>
+              <tr>
+                <td class="commitment">${rep.public_bills ? '✓' : ''}</td>
+                <td>Bills made public for 72 hours</td>
+              </tr>
+              <tr>
+                <td class="commitment">${rep.roll_call ? '✓' : ''}</td>
+                <td>Lower threshold for public roll call</td>
+              </tr>
+            </table>
+          </p>
+        ` : '');
+
+        const callToAction = (rep) => `
           <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}"
             target="_parent"
           >
-            ${text}
+            <strong>Join ${rep.commitments ? 'the Campaign' : 'District Team'}</strong>
           </a>
         `;
 
@@ -160,19 +199,11 @@
           <p>
             <strong>${rep.first_name} ${rep.last_name}</strong>
             ${rep.url ? `(<a href="${rep.url}">contact</a>)` : ''}
-            <br />${rep.party} ${rep.elect ? '(Elect)' : ''}
-            <br />${rep.district}
+            <br />${rep.party}, ${rep.district} ${rep.elect ? '(Elect)' : ''}
           </p>
 
-          <p>
-            ${rep.vote ? `
-              <strong>Committed to Vote</strong>
-              ${rep.vote_note ? `<br />(${rep.vote_note})` : ''}
-              <br />${callToAction(rep, 'Join the Campaign')}
-            ` : `
-              ${callToAction(rep, '<strong>Join District Team</strong>')}
-            `}
-          </p>
+          ${repCommitments(rep)}
+          ${callToAction(rep)}
         `;
 
         const houseLayer = L.geoJson(houseFeatures, {
@@ -206,7 +237,7 @@
             latlng.layer.openPopup();
           },
         });
-    
+
         L.map('map')
           .addLayer(L.tileLayer.provider('CartoDB.Positron'))
           .addLayer(houseLayer)
