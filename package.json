@@ -1,7 +1,7 @@
 {
   "name": "actonmass-campaign-map",
   "version": "2020.11.0",
-  "description": "Map of commitments to Act On Mass Transparency Campaign",
+  "description": "Map of commitments to the Act On Mass Transparency Campaign",
   "author": "Brian H. Rutledge",
   "license": "CC0-1.0",
   "main": "index.js",
