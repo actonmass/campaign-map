@@ -82,6 +82,7 @@
 
     .leaflet-control-search .search-input {
       outline: none;
+      width: 15rem;
     }
 
     .leaflet-control-search .search-tooltip {
@@ -102,7 +103,8 @@
       width: 100%;
     }
 
-    th, td {
+    th,
+    td {
       text-align: left;
       vertical-align: baseline;
       white-space: nowrap;
@@ -209,13 +211,31 @@
         const houseLayer = L.geoJson(houseFeatures, {
           style: (feature) => districtStyle(repProperties(feature)),
           onEachFeature: (feature, layer) => {
-            layer.bindPopup(districtPopup(repProperties(feature)));
+            const rep = repProperties(feature);
+
+            layer.bindPopup(districtPopup(rep));
 
             function setActive(active = false) {
               layer.getElement().classList.toggle('district--active', active);
             }
             layer.on('popupopen', () => setActive(true));
             layer.on('popupclose', () => setActive(false));
+
+            // Enable searching by name or district
+            // eslint-disable-next-line no-param-reassign
+            feature.properties.index = `${rep.first_name} ${rep.last_name} - ${rep.district}`;
+          },
+        });
+
+        const searchControl = new L.Control.Search({
+          layer: houseLayer,
+          propertyName: 'index',
+          initial: false,
+          marker: false,
+          textPlaceholder: 'Search reps and districts',
+          moveToLocation(latlng, title, map) {
+            map.fitBounds(latlng.layer.getBounds());
+            latlng.layer.openPopup();
           },
         });
 
@@ -226,23 +246,11 @@
           return div;
         };
 
-        const searchControl = new L.Control.Search({
-          layer: houseLayer,
-          propertyName: 'district',
-          initial: false,
-          marker: false,
-          textPlaceholder: 'Search districts',
-          moveToLocation(latlng, title, map) {
-            map.fitBounds(latlng.layer.getBounds());
-            latlng.layer.openPopup();
-          },
-        });
-
         L.map('map')
           .addLayer(L.tileLayer.provider('CartoDB.Positron'))
           .addLayer(houseLayer)
-          .addControl(legendControl)
           .addControl(searchControl)
+          .addControl(legendControl)
           .fitBounds(houseLayer.getBounds());
       });
   </script>
