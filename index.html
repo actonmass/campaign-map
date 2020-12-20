@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>Representative support for Act On Mass Transparency Campaign</title>
+  <title>Commitments to Act On Mass Transparency Campaign</title>
   <base target="_blank">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
@@ -146,7 +146,7 @@
         function repProperties(feature) {
           const supporter = supportersByDistrict[feature.properties.district];
           return supporter;
-          /* TODO: Join with feature properties once tracker data is finalized
+          /* TODO: Join with feature properties once supporter data is finalized
           // Supporter info from Sheet may be incomplete, so only prefer it to
           // replace outgoing incumbents
           return supporter && supporter.elect

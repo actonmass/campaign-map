@@ -1,7 +1,7 @@
 {
-  "name": "actonmass-rep-map",
+  "name": "actonmass-campaign-map",
   "version": "2020.11.0",
-  "description": "Representative Support for Act On Mass",
+  "description": "Map of commitments to Act On Mass Transparency Campaign",
   "author": "Brian H. Rutledge",
   "license": "CC0-1.0",
   "main": "index.js",
@@ -20,12 +20,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bhrutledge/actonmass-rep-map.git"
+    "url": "git+https://github.com/bhrutledge/actonmass-campaign-map.git"
   },
   "bugs": {
-    "url": "https://github.com/bhrutledge/actonmass-rep-map/issues"
+    "url": "https://github.com/bhrutledge/actonmass-campaign-map/issues"
   },
-  "homepage": "https://github.com/bhrutledge/actonmass-rep-map#readme",
+  "homepage": "https://github.com/bhrutledge/actonmass-campaign-map#readme",
   "browserslist": [
     "defaults and > 0.5% in US",
     "not IE 11"
