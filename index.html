@@ -129,6 +129,9 @@
 
   <script>
     /* global L, Papa */
+
+    /* Load the supporter data and house district boundaries */
+
     Promise.all([
       fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4l7bRcBIgwsEPGM_s9zF9csIeTgE2No_4tA6MuDCBUbfmWY_e9mAfzPpCJTsIK_hUzOyJ8CmdGMsX/pub?gid=641305740&single=true&output=csv')
         .then((response) => response.text())
@@ -148,13 +151,15 @@
         function repProperties(feature) {
           const supporter = supportersByDistrict[feature.properties.district];
           return supporter;
-          /* TODO: Join with feature properties once supporter data is finalized
+          /* TODO: Join with feature properties when contact info for "elect" reps is added
           // Supporter info from Sheet may be incomplete, so only prefer it to
           // replace outgoing incumbents
           return supporter && supporter.elect
             ? { ...feature.properties, ...supporter } : { ...supporter, ...feature.properties };
           */
         }
+
+        /* Templates for map elements */
 
         const districtLegend = () => `
           <div class="legend__item legend__item--committed">
@@ -208,20 +213,24 @@
           ${callToAction(rep)}
         `;
 
+        const onPopup = (e) => {
+          const active = e.type === 'popupopen';
+          e.target.getElement().classList.toggle('district--active', active);
+        };
+
+        /* Build the map */
+
         const houseLayer = L.geoJson(houseFeatures, {
           style: (feature) => districtStyle(repProperties(feature)),
           onEachFeature: (feature, layer) => {
             const rep = repProperties(feature);
 
             layer.bindPopup(districtPopup(rep));
+            layer.on('popupopen', onPopup);
+            layer.on('popupclose', onPopup);
 
-            function setActive(active = false) {
-              layer.getElement().classList.toggle('district--active', active);
-            }
-            layer.on('popupopen', () => setActive(true));
-            layer.on('popupclose', () => setActive(false));
-
-            // Enable searching by name or district
+            // Enable searching by name or district; inspired by:
+            // https://github.com/stefanocudini/leaflet-search/issues/52#issuecomment-266168224
             // eslint-disable-next-line no-param-reassign
             feature.properties.index = `${rep.first_name} ${rep.last_name} - ${rep.district}`;
           },
