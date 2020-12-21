@@ -4,7 +4,7 @@ Map of commitments to the [Act On Mass Transparency Campaign](https://actonmass.
 
 Built with [Leaflet](https://leafletjs.com/), using data from a Google Sheet provided by the campaign, combined with geographic data from [bhrutledge/ma-legislature](https://github.com/bhrutledge/ma-legislature). Hosted on GitHub Pages.
 
-I hope that this can serve as an example for similar maps, and maybe evolve into a template.
+Hopefully this can serve as an example for similar maps, and maybe evolve into a template.
 
 ## Developing
 

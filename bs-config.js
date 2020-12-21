@@ -2,7 +2,7 @@ module.exports = {
   watch: true,
   rewriteRules: [
     {
-      match: /https:\/\/bhrutledge.com\/actonmass-campaign-map/g,
+      match: /https:\/\/actonmass.github.io\/campaign-map/g,
       fn: () => 'http://localhost:3000',
     },
   ],

@@ -20,12 +20,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bhrutledge/actonmass-campaign-map.git"
+    "url": "git+https://github.com/actonmass/campaign-map.git"
   },
   "bugs": {
-    "url": "https://github.com/bhrutledge/actonmass-campaign-map/issues"
+    "url": "https://github.com/actonmass/campaign-map/issues"
   },
-  "homepage": "https://github.com/bhrutledge/actonmass-campaign-map#readme",
+  "homepage": "https://github.com/actonmass/campaign-map#readme",
   "browserslist": [
     "defaults and > 0.5% in US",
     "not IE 11"
