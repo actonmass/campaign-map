@@ -19,11 +19,22 @@
 
     body {
       margin: 0;
+      /* Matching .leaflet-container */
+      background: #ddd;
     }
 
     #map {
       height: 100%;
       width: 100%;
+    }
+
+    #map:not(.leaflet-container)::after {
+      content: '…loading map…';
+      display: block;
+      padding: 1rem;
+      text-align: center;
+      /* Matching .leaflet-container */
+      font: oblique 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif;
     }
 
     a {
