@@ -266,12 +266,14 @@
           return div;
         };
 
-        L.map('map')
+        const map = L.map('map')
           .addLayer(L.tileLayer.provider('CartoDB.Positron'))
           .addLayer(houseLayer)
           .addControl(searchControl)
           .addControl(legendControl)
           .fitBounds(houseLayer.getBounds());
+
+        map.setMinZoom(map.getZoom());
       });
   </script>
 </body>
