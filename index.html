@@ -8,6 +8,7 @@
     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
     crossorigin="" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-search@2.9.9/dist/leaflet-search.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.css" />
 
   <style>
     :root {
@@ -136,6 +137,7 @@
     crossorigin=""></script>
   <script src="https://unpkg.com/leaflet-providers@1.11.0/leaflet-providers.js"></script>
   <script src="https://unpkg.com/leaflet-search@2.9.9/dist/leaflet-search.min.js"></script>
+  <script src="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.js"></script>
   <script src="https://unpkg.com/papaparse@5.3.0/papaparse.min.js"></script>
 
   <script>
@@ -259,6 +261,8 @@
           },
         });
 
+        const fullscreenControl = L.control.fullscreen();
+
         const legendControl = L.control({ position: 'topright' });
         legendControl.onAdd = () => {
           const div = L.DomUtil.create('div', 'legend');
@@ -269,11 +273,17 @@
         const map = L.map('map')
           .addLayer(L.tileLayer.provider('CartoDB.Positron'))
           .addLayer(houseLayer)
+          .addControl(fullscreenControl)
           .addControl(searchControl)
-          .addControl(legendControl)
-          .fitBounds(houseLayer.getBounds());
+          .addControl(legendControl);
 
-        map.setMinZoom(map.getZoom());
+        // TODO: Figure out how to setMinZoom to avoid excessive zoom out
+        // Maybe setMinZoom(0) on enter/exit fullscreen
+        // Then setMinZoom(getZoom()) once zoomend
+        map.on('resize', () => {
+          map.fitBounds(houseLayer.getBounds());
+        });
+        map.fire('resize');
       });
   </script>
 </body>
