@@ -217,7 +217,9 @@
           <p>
             <strong>${rep.first_name} ${rep.last_name}</strong>
             ${rep.url ? `(<a href="${rep.url}">contact</a>)` : ''}
-            <br />${rep.party}, ${rep.district} ${rep.elect ? '(Elect)' : ''}
+            <br />${rep.party ? `${rep.party},` : ''}
+            ${rep.district}
+            ${rep.elect ? '(Elect)' : ''}
           </p>
 
           ${repCommitments(rep)}

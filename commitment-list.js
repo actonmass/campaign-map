@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         repList.insertAdjacentHTML('beforeend', `
           <li>
             Rep. ${rep.first_name} ${rep.last_name}
-            (${rep.party[0]} - ${rep.district}):
+            (${rep.party ? `${rep.party[0]} - ` : ''}${rep.district}):
             Amendment${commitments.length > 1 ? 's' : ''}
             ${commitments.join(', ')}
           </li>
