@@ -15,6 +15,8 @@
       --join-color--active: rgba(0, 0, 0, 0.4);
       --committed-color: rgba(90, 186, 161, 0.6);
       --committed-color--active: rgba(90, 186, 161, 0.9);
+      --voted-color: rgba(250, 162, 0, 0.5);
+      --voted-color--active: rgba(250, 162, 0, 0.9);
     }
 
     body {
@@ -68,6 +70,10 @@
       background: var(--committed-color);
     }
 
+    .legend__item--voted::before {
+      background: var(--voted-color);
+    }
+
     .district {
       fill: var(--join-color);
       fill-opacity: 1;
@@ -89,6 +95,14 @@
 
     .district--committed.district--active {
       fill: var(--committed-color--active);
+    }
+
+    .district--voted {
+      fill: var(--voted-color);
+    }
+
+    .district--voted.district--active {
+      fill: var(--voted-color--active);
     }
 
     .leaflet-control-search .search-input {
@@ -176,13 +190,17 @@
           <div class="legend__item legend__item--committed">
             Committed to Vote
           </div>
+          <div class="legend__item legend__item--voted">
+            Voted in 2019
+          </div>
           <div class="legend__item legend__item--join">
             Join District Team
           </div>
         `;
 
         const districtStyle = (rep) => ({
-          className: `district district--${rep.commitments ? 'committed' : 'join'}`,
+          // Expecting "committed", "voted", or "join"
+          className: `district district--${rep.color}`,
         });
 
         const repCommitments = (rep) => (rep.commitments ? `
