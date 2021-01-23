@@ -15,6 +15,9 @@
       --join-color--active: rgba(0, 0, 0, 0.4);
       --committed-color: rgba(90, 186, 161, 0.6);
       --committed-color--active: rgba(90, 186, 161, 0.9);
+      --vote-Y-color: rgba(250, 162, 0, 0.5);
+      --vote-Y-color--active: rgba(250, 162, 0, 0.9);
+      --vote-N-color: rgba(128, 128, 128, 1.0);
     }
 
     body {
@@ -68,6 +71,10 @@
       background: var(--committed-color);
     }
 
+    .legend__item--voted::before {
+      background: var(--vote-Y-color);
+    }
+
     .district {
       fill: var(--join-color);
       fill-opacity: 1;
@@ -89,6 +96,14 @@
 
     .district--committed.district--active {
       fill: var(--committed-color--active);
+    }
+
+    .district--voted {
+      fill: var(--vote-Y-color);
+    }
+
+    .district--voted.district--active {
+      fill: var(--vote-Y-color--active);
     }
 
     .leaflet-control-search .search-input {
@@ -123,7 +138,24 @@
 
     .commitment {
       color: var(--committed-color--active);
+      font-weight: bold;
       padding-right: 0.25rem;
+    }
+
+    .vote {
+      color: var(--vote-N-color);
+      font-weight: bold;
+      padding-right: 0.25rem;
+    }
+
+    .vote--Y {
+      color: var(--vote-Y-color--active);
+    }
+
+    .vote-details {
+      color: var(--vote-N-color);
+      font-size: 0.75rem;
+      font-style: oblique;
     }
   </style>
 </head>
@@ -172,9 +204,12 @@
 
         /* Templates for map elements */
 
-        const districtLegend = () => `
+        const districtLegend = () => /* html */`
           <div class="legend__item legend__item--committed">
             Committed to Vote
+          </div>
+          <div class="legend__item legend__item--voted">
+            Voted "Yes" in 2019
           </div>
           <div class="legend__item legend__item--join">
             Join District Team
@@ -182,30 +217,71 @@
         `;
 
         const districtStyle = (rep) => ({
-          className: `district district--${rep.commitments ? 'committed' : 'join'}`,
+          // Expecting "committed", "voted", or "join"
+          className: `district district--${rep.color}`,
         });
 
-        const repCommitments = (rep) => (rep.commitments ? `
+        const commitmentIcon = (commitment) => (commitment ? '✓' : '');
+
+        const repCommitments = (rep) => (rep.commitments ? /* html */`
           <p>
             <table>
-              <tr><th colspan="2">Committed to vote for:</strong>
-                <tr>
-                <td class="commitment">${rep.committee_votes ? '✓' : ''}</td>
+              <tr><th colspan="3">Committed to vote for:</strong></tr>
+              <tr>
+                <td class="commitment">${commitmentIcon(rep.committee_votes)}</td>
+                <td>1.</td>
                 <td>Committee votes made public</td>
               </tr>
               <tr>
-                <td class="commitment">${rep.public_bills ? '✓' : ''}</td>
+                <td class="commitment">${commitmentIcon(rep.public_bills)}</td>
+                <td>2.</td>
                 <td>Bills made public for 72 hours</td>
               </tr>
               <tr>
-                <td class="commitment">${rep.roll_call ? '✓' : ''}</td>
+                <td class="commitment">${commitmentIcon(rep.roll_call)}</td>
+                <td>3.</td>
                 <td>Lower threshold for public roll call</td>
               </tr>
             </table>
           </p>
         ` : '');
 
-        const callToAction = (rep) => `
+        const voteDetails = (rep) => {
+          const votes = [rep.committee_votes_2019, rep.public_bills_2019];
+          const details = [];
+
+          if (votes.includes('NA')) {
+            details.push('(NA = Not a representative in 2019)');
+          }
+          if (votes.includes('X')) {
+            details.push('(X = Not present for vote)');
+          }
+
+          return details.length ? /* html */`
+            <div class="vote-details">${details.join('<br>')}</div>
+          ` : '';
+        };
+
+        const repVotes = (rep) => /* html */`
+          <p>
+            <table>
+              <tr><th colspan="2">How they voted in 2019:</strong></tr>
+              <tr>
+                <td class="vote vote--${rep.committee_votes_2019}">${rep.committee_votes_2019}</td>
+                <td>Committee votes made public</td>
+              </tr>
+              <tr>
+                <td class="vote vote--${rep.public_bills_2019}">${rep.public_bills_2019}</td>
+                <td>Bills made public for 72 hours</td>
+              </tr>
+              <tr>
+                <td class="vote-details" colspan="2">${voteDetails(rep)}</td>
+              </tr>
+            </table>
+          </p>
+        `;
+
+        const callToAction = (rep) => /* html */`
           <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}#join-your-district-team"
             target="_parent"
           >
@@ -223,6 +299,7 @@
           </p>
 
           ${repCommitments(rep)}
+          ${repVotes(rep)}
           ${callToAction(rep)}
         `;
 
