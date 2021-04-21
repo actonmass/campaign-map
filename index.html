@@ -284,7 +284,7 @@
         `;
 
         const callToAction = (rep) => /* html */`
-          <a href="https://actonmass.org/the-campaign/?your_state_representative=${rep.first_name} ${rep.last_name}#join-your-district-team"
+          <a href="https://actonmass.org/the-campaign/?state_rep=${rep.last_name}, ${rep.first_name}"
             target="_parent"
           >
             <strong>Join ${rep.commitments ? 'the Campaign' : 'District Team'}</strong>
