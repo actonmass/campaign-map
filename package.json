@@ -1,7 +1,7 @@
 {
   "name": "actonmass-campaign-map",
   "version": "2021.1.0",
-  "description": "Map of commitments to the Act On Mass Transparency Campaign",
+  "description": "Map of commitments to The People's House campaign",
   "author": "Brian H. Rutledge",
   "license": "CC0-1.0",
   "main": "index.js",
