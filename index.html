@@ -351,6 +351,7 @@
           initial: false,
           marker: false,
           textPlaceholder: 'Search reps and districts',
+          autoCollapse: true,
           moveToLocation(latlng, title, map) {
             map.fitBounds(latlng.layer.getBounds());
             latlng.layer.openPopup();
