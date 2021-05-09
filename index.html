@@ -12,8 +12,8 @@
 
   <style>
     :root {
-      --join-color: rgba(0, 0, 0, 0.2);
-      --join-color--active: rgba(0, 0, 0, 0.4);
+      --none-color: rgba(0, 0, 0, 0.2);
+      --none-color--active: rgba(0, 0, 0, 0.4);
       --committed-color: rgba(90, 186, 161, 0.6);
       --committed-color--active: rgba(90, 186, 161, 0.9);
       --vote-Y-color: rgba(250, 162, 0, 0.5);
@@ -59,7 +59,7 @@
     }
 
     .legend__item::before {
-      background: var(--join-color);
+      background: var(--none-color);
       border-radius: 2px;
       content: '';
       display: block;
@@ -77,9 +77,9 @@
     }
 
     .district {
-      fill: var(--join-color);
+      fill: var(--none-color);
       fill-opacity: 1;
-      stroke: var(--join-color);
+      stroke: var(--none-color);
       stroke-width: 1;
     }
 
@@ -88,7 +88,7 @@
     }
 
     .district--active {
-      fill: var(--join-color--active);
+      fill: var(--none-color--active);
     }
 
     .district--committed {
@@ -215,7 +215,7 @@
         `;
 
         const districtStyle = (rep) => ({
-          // Expecting "committed", "voted", or "join"
+          // Expecting "committed", "voted", or "none"
           className: `district district--${rep.color}`,
         });
 
