@@ -177,7 +177,7 @@
     /* Load the supporter data and house district boundaries */
 
     Promise.all([
-      fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4l7bRcBIgwsEPGM_s9zF9csIeTgE2No_4tA6MuDCBUbfmWY_e9mAfzPpCJTsIK_hUzOyJ8CmdGMsX/pub?gid=2004051365&single=true&output=csv')
+      fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQ4l7bRcBIgwsEPGM_s9zF9csIeTgE2No_4tA6MuDCBUbfmWY_e9mAfzPpCJTsIK_hUzOyJ8CmdGMsX/pub?gid=1171285610&single=true&output=csv')
         .then((response) => response.text())
         .then((csv) => {
           const parsed = Papa.parse(csv, { header: true, dynamicTyping: true });
@@ -245,11 +245,20 @@
         ` : '');
 
         const voteDetails = (rep) => {
-          const votes = [rep.committee_votes_2019, rep.public_bills_2019, rep.term_limits_2015];
+          const votes = [
+            rep.committee_votes_2021,
+            rep.committee_votes_2019,
+            rep.public_bills_2019,
+            rep.term_limits_2019,
+            rep.term_limits_2015,
+          ];
           const details = [];
 
           if (votes.includes('NA')) {
             details.push('(NA = Not yet a representative)');
+          }
+          if (votes.includes('P')) {
+            details.push('(P = Present, no vote)');
           }
           if (votes.includes('X')) {
             details.push('(X = Not present for vote)');
@@ -265,12 +274,20 @@
             <table>
               <tr><th colspan="2">How they've voted:</strong></tr>
               <tr>
+                <td class="vote vote--${rep.committee_votes_2021}">${rep.committee_votes_2021}</td>
+                <td>Make all committee votes public (2021)</td>
+              </tr>
+              <tr>
                 <td class="vote vote--${rep.committee_votes_2019}">${rep.committee_votes_2019}</td>
                 <td>Make all committee votes public (2019)</td>
               </tr>
               <tr>
                 <td class="vote vote--${rep.public_bills_2019}">${rep.public_bills_2019}</td>
                 <td>Ensure bills are public 72 hours before a vote (2019)</td>
+              </tr>
+              <tr>
+                <td class="vote vote--${rep.term_limits_2019}">${rep.term_limits_2019}</td>
+                <td>Reinstate term limits for the Speaker (2019)</td>
               </tr>
               <tr>
                 <td class="vote vote--${rep.term_limits_2015}">${rep.term_limits_2015}</td>
